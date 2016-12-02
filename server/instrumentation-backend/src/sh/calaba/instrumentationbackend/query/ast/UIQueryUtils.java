@@ -418,17 +418,28 @@ public class UIQueryUtils {
 	protected static Map<?, ?> dumpRecursively(Map parentView, List<View> children) {
         ArrayList childrenArray = new ArrayList(32);
         List<Integer> parentPath = Collections.unmodifiableList((List<Integer>) parentView.get("path"));
-		for (int i = 0; i < children.size(); i++) {
-            View view = children.get(i);
-            FutureTask<Map<?, ?>> childrenForChild = new FutureTask<Map<?,?>>(new DumpChild(view, parentPath, i));
-            runOnViewThread(view, childrenForChild);
+		long timeout = System.currentTimeMillis() + 30000;
 
-            try {
-                childrenArray.add(childrenForChild.get(10, TimeUnit.SECONDS));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
+		while(childrenArray.size() != children.size()) {
+			for (int i = 0; i < children.size(); i++) {
+				View view = children.get(i);
+				FutureTask<Map<?, ?>> childrenForChild = new FutureTask<Map<?, ?>>(new DumpChild(view, parentPath, i));
+				runOnViewThread(view, childrenForChild);
+
+				try {
+					if(!childrenForChild.isDone()) {
+						childrenForChild.run();
+					}
+					childrenArray.add(childrenForChild.get(10, TimeUnit.SECONDS));
+
+					if(System.currentTimeMillis() > timeout) {
+						throw new TimeoutException();
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 
 		parentView.put("children", childrenArray);
 

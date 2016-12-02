@@ -124,11 +124,23 @@ public class UIQueryASTClassName implements UIQueryAST {
 
         try {
             processedResult = new ArrayList<UIObject>();
+			int processedCount = 0;
+			long timeout = System.currentTimeMillis() + 30000;
 
-            for (Future<List<? extends UIObject>> future : futureResults) {
-                List<? extends UIObject> uiObjects = future.get(10, TimeUnit.SECONDS);
-                processedResult.addAll(uiObjects);
-            }
+			while(processedCount != futureResults.size()) {
+				for (Future<List<? extends UIObject>> future : futureResults) {
+					if (future.isDone()) {
+						List<? extends UIObject> uiObjects = future.get(10, TimeUnit.SECONDS);
+						processedResult.addAll(uiObjects);
+						processedCount++;
+					}
+				}
+
+				if(System.currentTimeMillis() > timeout) {
+					throw new TimeoutException();
+				}
+			}
+
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
