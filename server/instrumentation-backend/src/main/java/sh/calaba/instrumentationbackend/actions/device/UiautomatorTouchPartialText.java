@@ -1,4 +1,4 @@
-package sh.calaba.instrumentationbackend.actions.device;
+package main.java.sh.calaba.instrumentationbackend.actions.device;
 
 import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObjectNotFoundException;
