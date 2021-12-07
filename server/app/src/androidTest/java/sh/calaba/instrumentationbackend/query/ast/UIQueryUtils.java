@@ -690,6 +690,7 @@ public class UIQueryUtils {
 			m.put("value", extractValueFromView(view));
 			m.put("type", ViewMapper.getClassNameForView(view));
 			m.put("name", getNameForView(view));
+			m.put("tag", ViewMapper.getTagForView(view));
 			m.put("label", ViewMapper.getContentDescriptionForView(view));
 			return m;
 		}
