@@ -15,7 +15,7 @@ import sh.calaba.instrumentationbackend.Result;
 import sh.calaba.instrumentationbackend.actions.Action;
 
 /**
- * Created by rajdeepvarma on 10/12/16.
+ * Created by PrabhashSingh on 02/09/19.
  */
 public class UiautomatorScreenDump implements Action {
     @Override

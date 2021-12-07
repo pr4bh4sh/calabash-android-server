@@ -3,9 +3,12 @@ package sh.calaba.instrumentationbackend;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Intent;
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
+
+import sh.calaba.instrumentationbackend.actions.device.NotificationListener;
 
 /**
  * Handles application life cycle using instrumentation
@@ -31,12 +34,14 @@ public class CalabashInstrumentationApplicationLifeCycle implements ApplicationL
 
         startIntentAdded.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         instrumentation.setInTouchMode(true);
+        NotificationListener.getInstance().start();
 
         return getInstrumentation().startActivitySync(startIntentAdded);
     }
 
     @Override
     public void stop() {
+        Log.d("Toast listener", "Attempting to stop");
         Iterator<WeakReference<Activity>> iterator = instrumentation.getLastActivitiesIterator();
 
         while (iterator.hasNext()) {
@@ -46,7 +51,11 @@ public class CalabashInstrumentationApplicationLifeCycle implements ApplicationL
                 Activity activity = weakReference.get();
 
                 if (activity != null) {
+                    Log.d("Toast listener", "Activity found stopping the listener");
+                    NotificationListener.getInstance().stop();
                     activity.finish();
+                }else {
+                    Log.d("Toast listener", "Activity not found, listener should not exist");
                 }
             }
         }
